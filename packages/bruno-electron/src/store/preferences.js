@@ -22,7 +22,8 @@ const defaultPreferences = {
     sendCookies: true,
     timeout: 0,
     oauth2: {
-      useSystemBrowser: false
+      useSystemBrowser: false,
+      useSystemBrowserIncognito: false
     }
   },
   font: {
@@ -112,7 +113,8 @@ const preferencesSchema = Yup.object().shape({
     sendCookies: Yup.boolean(),
     timeout: Yup.number(),
     oauth2: Yup.object({
-      useSystemBrowser: Yup.boolean()
+      useSystemBrowser: Yup.boolean(),
+      useSystemBrowserIncognito: Yup.boolean()
     })
   }),
   font: Yup.object().shape({
@@ -386,6 +388,9 @@ const preferencesUtil = {
   },
   shouldUseSystemBrowser: () => {
     return get(getPreferences(), 'request.oauth2.useSystemBrowser', false);
+  },
+  shouldUseSystemBrowserIncognito: () => {
+    return get(getPreferences(), 'request.oauth2.useSystemBrowserIncognito', false);
   },
   getResponsePaneOrientation: () => {
     return get(getPreferences(), 'layout.responsePaneOrientation', 'horizontal');

@@ -58,7 +58,8 @@ const General = () => {
       return true;
     }),
     oauth2: Yup.object({
-      useSystemBrowser: Yup.boolean()
+      useSystemBrowser: Yup.boolean(),
+      useSystemBrowserIncognito: Yup.boolean()
     }),
     defaultLocation: Yup.string().max(1024)
   });
@@ -81,7 +82,8 @@ const General = () => {
         interval: get(preferences, 'autoSave.interval', 1000)
       },
       oauth2: {
-        useSystemBrowser: get(preferences, 'request.oauth2.useSystemBrowser', false)
+        useSystemBrowser: get(preferences, 'request.oauth2.useSystemBrowser', false),
+        useSystemBrowserIncognito: get(preferences, 'request.oauth2.useSystemBrowserIncognito', false)
       },
       defaultLocation: get(preferences, 'general.defaultLocation', '')
     },
@@ -113,7 +115,8 @@ const General = () => {
           storeCookies: newPreferences.storeCookies,
           sendCookies: newPreferences.sendCookies,
           oauth2: {
-            useSystemBrowser: newPreferences.oauth2.useSystemBrowser
+            useSystemBrowser: newPreferences.oauth2.useSystemBrowser,
+            useSystemBrowserIncognito: newPreferences.oauth2.useSystemBrowserIncognito
           }
         },
         autoSave: {
@@ -300,6 +303,20 @@ const General = () => {
           />
           <label className="block ml-2 select-none" htmlFor="oauth2.useSystemBrowser">
             Use System Browser for OAuth2 Authorization
+          </label>
+        </div>
+        <div className={`flex items-center mt-2 ${formik.values.oauth2.useSystemBrowser ? '' : 'opacity-50'}`}>
+          <input
+            id="oauth2.useSystemBrowserIncognito"
+            type="checkbox"
+            name="oauth2.useSystemBrowserIncognito"
+            checked={formik.values.oauth2.useSystemBrowserIncognito}
+            onChange={formik.handleChange}
+            disabled={!formik.values.oauth2.useSystemBrowser}
+            className="mousetrap mr-0"
+          />
+          <label className="block ml-2 select-none" htmlFor="oauth2.useSystemBrowserIncognito">
+            Use Incognito Browser for OAuth2 Authorization
           </label>
         </div>
         <div className="flex flex-col mt-6">

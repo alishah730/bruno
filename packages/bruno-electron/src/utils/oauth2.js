@@ -307,6 +307,7 @@ const getOAuth2AuthorizationCode = (request, codeChallenge, collectionUid) => {
     const { oauth2 } = request;
     const { callbackUrl, clientId, authorizationUrl, scope, state, pkce, accessTokenUrl, additionalParameters } = oauth2;
     const useSystemBrowser = preferencesUtil.shouldUseSystemBrowser();
+    const useSystemBrowserIncognito = useSystemBrowser && preferencesUtil.shouldUseSystemBrowserIncognito();
     const effectiveCallbackUrl = callbackUrl && callbackUrl.length ? callbackUrl : BRUNO_OAUTH2_CALLBACK_URL;
     // Always append a cryptographically random nonce to the user-configured state
     // (or generate a fully random one when none is set). The state is validated when
@@ -349,6 +350,7 @@ const getOAuth2AuthorizationCode = (request, codeChallenge, collectionUid) => {
         callbackUrl: effectiveCallbackUrl,
         session: oauth2Store.getSessionIdOfCollection({ collectionUid, url: accessTokenUrl }),
         expectedState: effectiveState,
+        useIncognito: useSystemBrowserIncognito,
         additionalHeaders: getAdditionalHeaders(additionalParameters?.authorization)
       });
       resolve({ authorizationCode, debugInfo });
@@ -776,6 +778,7 @@ const getOAuth2TokenUsingImplicitGrant = async ({ request, collectionUid, forceF
     additionalParameters
   } = oauth2;
   const useSystemBrowser = preferencesUtil.shouldUseSystemBrowser();
+  const useSystemBrowserIncognito = useSystemBrowser && preferencesUtil.shouldUseSystemBrowserIncognito();
   const effectiveCallbackUrl = callbackUrl && callbackUrl.length ? callbackUrl : BRUNO_OAUTH2_CALLBACK_URL;
   // Use the user-configured state if present, otherwise generate a cryptographically
   // random one. The state is validated when the callback is received to prevent CSRF.
@@ -886,6 +889,7 @@ const getOAuth2TokenUsingImplicitGrant = async ({ request, collectionUid, forceF
       session: oauth2Store.getSessionIdOfCollection({ collectionUid, url: authorizationUrl }),
       grantType: 'implicit',
       expectedState: effectiveState,
+      useIncognito: useSystemBrowserIncognito,
       additionalHeaders: getAdditionalHeaders(additionalParameters?.authorization)
     });
 

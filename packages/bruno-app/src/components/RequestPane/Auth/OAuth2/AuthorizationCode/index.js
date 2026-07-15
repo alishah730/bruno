@@ -24,6 +24,7 @@ const OAuth2AuthorizationCode = ({ save, item = {}, request, handleRun, updateAu
     color: theme?.text
   };
   const useSystemBrowser = get(preferences, 'request.oauth2.useSystemBrowser', false);
+  const useSystemBrowserIncognito = get(preferences, 'request.oauth2.useSystemBrowserIncognito', false);
   const { isSensitive } = useDetectSensitiveField(collection);
   const oAuth = get(request, 'auth.oauth2', {});
   const {
@@ -113,16 +114,15 @@ const OAuth2AuthorizationCode = ({ save, item = {}, request, handleRun, updateAu
     );
   };
 
-  const handleUseSystemBrowserToggle = (e) => {
-    const newValue = e.target.checked;
+  const handleOAuth2BrowserPreferenceChange = (updates) => {
     dispatch(
       savePreferences({
         ...preferences,
         request: {
-          ...preferences.request,
+          ...get(preferences, 'request', {}),
           oauth2: {
-            ...preferences.request.oauth2,
-            useSystemBrowser: newValue
+            ...get(preferences, 'request.oauth2', {}),
+            ...updates
           }
         }
       })
@@ -134,6 +134,14 @@ const OAuth2AuthorizationCode = ({ save, item = {}, request, handleRun, updateAu
         console.error(err);
         toast.error('Failed to update preference');
       });
+  };
+
+  const handleUseSystemBrowserToggle = (e) => {
+    handleOAuth2BrowserPreferenceChange({ useSystemBrowser: e.target.checked });
+  };
+
+  const handleUseSystemBrowserIncognitoToggle = (e) => {
+    handleOAuth2BrowserPreferenceChange({ useSystemBrowserIncognito: e.target.checked });
   };
 
   return (
@@ -167,22 +175,44 @@ const OAuth2AuthorizationCode = ({ save, item = {}, request, handleRun, updateAu
       </div>
       <div className="flex items-center gap-4 w-full" key="input-use-system-browser">
         <label className="block min-w-[140px]"></label>
-        <div className="flex items-center gap-2">
-          <input
-            type="checkbox"
-            checked={Boolean(useSystemBrowser)}
-            onChange={handleUseSystemBrowserToggle}
-            className="cursor-pointer"
-          />
-          <label
-            className="block cursor-pointer"
-            onClick={(e) => {
-              e.preventDefault();
-              handleUseSystemBrowserToggle({ target: { checked: !useSystemBrowser } });
-            }}
-          >
-            Use system browser for OAuth
-          </label>
+        <div className="flex flex-wrap items-center gap-x-6 gap-y-2">
+          <div className="flex items-center gap-2">
+            <input
+              type="checkbox"
+              checked={Boolean(useSystemBrowser)}
+              onChange={handleUseSystemBrowserToggle}
+              className="cursor-pointer"
+            />
+            <label
+              className="block cursor-pointer"
+              onClick={(e) => {
+                e.preventDefault();
+                handleUseSystemBrowserToggle({ target: { checked: !useSystemBrowser } });
+              }}
+            >
+              Use system browser for OAuth
+            </label>
+          </div>
+          <div className={`flex items-center gap-2 ${useSystemBrowser ? '' : 'opacity-50'}`}>
+            <input
+              type="checkbox"
+              checked={Boolean(useSystemBrowserIncognito)}
+              onChange={handleUseSystemBrowserIncognitoToggle}
+              disabled={!useSystemBrowser}
+              className="cursor-pointer"
+            />
+            <label
+              className={`block ${useSystemBrowser ? 'cursor-pointer' : 'cursor-default'}`}
+              onClick={(e) => {
+                e.preventDefault();
+                if (useSystemBrowser) {
+                  handleUseSystemBrowserIncognitoToggle({ target: { checked: !useSystemBrowserIncognito } });
+                }
+              }}
+            >
+              Use incognito browser
+            </label>
+          </div>
         </div>
       </div>
       {inputsConfig.map((input) => {

@@ -38,7 +38,8 @@ const initialState = {
       },
       timeout: 0,
       oauth2: {
-        useSystemBrowser: false
+        useSystemBrowser: false,
+        useSystemBrowserIncognito: false
       }
     },
     font: {
